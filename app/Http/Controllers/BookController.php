@@ -10,13 +10,20 @@ class BookController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    // BookController.php
+    // BookController.php
+    public function index(Request $request)
     {
-        // Recupera 10 libri per pagina
-        $books = Book::paginate(10);
+        $search = $request->query('search');
 
-        // 3. Restituisci la risposta in formato JSON con status 200 (OK)
-        return response()->json($books, 200);
+        $books = Book::when($search, function ($query, $search) {
+            return $query->where('titolo', 'like', "%{$search}%")
+                         ->orWhere('autore', 'like', "%{$search}%");
+        })
+        ->latest() // <--- Questo mette i nuovi inserimenti in cima
+        ->paginate(10);
+
+        return response()->json($books);
     }
 
     /**
