@@ -10,18 +10,18 @@ class BookResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @return array<string, mixed>
+
      */
+    // app/Http/Resources/BookResource.php
     public function toArray(Request $request): array
     {
         return [
             'id'          => $this->id,
-            'title'       => $this->titolo, // Posso rinominare i campi per l'esterno
-            'author'      => $this->autore,
-            'year'        => $this->anno,
-            'genre'       => $this->genere,
-            'description' => $this->descrizione,
-            'created_at'  => $this->created_at->format('d-m-Y'), // Formatto la data
+            'titolo'      => $this->titolo, // Mantieni i nomi originali se il frontend li usa già
+            'autore'      => $this->autore,
+            'anno'        => $this->anno,
+            'genere'      => $this->genere,
+            'descrizione' => $this->descrizione,
         ];
     }
 }

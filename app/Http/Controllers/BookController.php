@@ -21,6 +21,8 @@ class BookController extends Controller
     {
         $books = $this->bookService->getAllBooks($request->query('search'));
 
+
+
         // collection() si usa per liste di dati impaginati
         return BookResource::collection($books);
     }
