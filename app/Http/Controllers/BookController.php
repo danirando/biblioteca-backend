@@ -6,6 +6,7 @@ use App\Services\BookService;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use Illuminate\Http\Request;
+use App\Http\Resources\BookResource;
 
 class BookController extends Controller
 {
@@ -18,26 +19,32 @@ class BookController extends Controller
 
     public function index(Request $request)
     {
-        return response()->json(
-            $this->bookService->getAllBooks($request->query('search'))
-        );
+        $books = $this->bookService->getAllBooks($request->query('search'));
+
+        // collection() si usa per liste di dati impaginati
+        return BookResource::collection($books);
     }
 
-    public function store(StoreBookRequest $request) // <-- Usa la Form Request
+    public function store(StoreBookRequest $request)
     {
-        // Se arrivi qui, i dati sono già stati validati
         $book = $this->bookService->createBook($request->validated());
 
-        return response()->json(['message' => 'Creato!', 'data' => $book], 201);
+        return (new BookResource($book))
+            ->additional(['message' => 'Libro creato con successo!'])
+            ->response()
+            ->setStatusCode(201);
     }
 
     public function show($id)
     {
         $book = $this->bookService->findBookById($id);
 
-        return $book
-            ? response()->json($book)
-            : response()->json(['message' => 'Non trovato'], 404);
+        if (!$book) {
+            return response()->json(['message' => 'Non trovato'], 404);
+        }
+
+        // Ritorna il singolo oggetto trasformato
+        return new BookResource($book);
     }
 
     public function update(UpdateBookRequest $request, $id) // <-- Usa la Form Request
